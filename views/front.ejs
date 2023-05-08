@@ -113,12 +113,10 @@
 <body>
     <div id="container">
         <div id="chat">
-            <!-- Título adicionado -->
             <div id="title">Chat Bot integrado a IA GPT-3</div>
             <div id="messages">
                 <% messages.forEach(function(message) { %>
-                    <div class="<%= message.role === 'user' ? 'user-message' : 'assistant-message' %>"><%- message.role
-                            %>: <%- message.content %></div>
+                    <div class="<%= message.role === 'user' ? 'user-message' : 'assistant-message' %>"><%- message.content %></div>
                     <% }); %>
             </div>
             <form id="message-form">
@@ -144,7 +142,6 @@
             const messagesDiv = document.querySelector('#messages');
             messagesDiv.innerHTML += `<div class="user-message">${message}</div>`;
 
-            // Mostra o indicador de digitando
             const typingIndicator = document.createElement('div');
             typingIndicator.className = 'typing-indicator';
             typingIndicator.textContent = 'digitando...';
@@ -159,7 +156,6 @@
                 body: JSON.stringify({ content: message }),
             }).then(res => res.json());
 
-            // Remove o indicador de digitando
             messagesDiv.removeChild(typingIndicator);
 
             messagesDiv.innerHTML += `<div class="assistant-message">${response.content}</div>`;
