@@ -31,6 +31,20 @@ if (initialConfig.ownerName) {
   messages.push({ role: 'system', content: `Nome do proprietário: ${initialConfig.ownerName}` });
 }
 
+// Adicionar funções como mensagens do sistema
+if (initialConfig.functions && Array.isArray(initialConfig.functions)) {
+  for (const func of initialConfig.functions) {
+    messages.push({ role: 'system', content: `Função: ${func}` });
+  }
+}
+
+// Adicionar regras como mensagens do sistema
+if (initialConfig.rules && Array.isArray(initialConfig.rules)) {
+  for (const rule of initialConfig.rules) {
+    messages.push({ role: 'system', content: `Regra: ${rule}` });
+  }
+}
+
 app.get('/', (req, res) => {
     res.render('front', { messages: messages.filter(message => message.role !== 'system') });
 });
