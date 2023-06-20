@@ -72,6 +72,8 @@ async function getAssistantMessage(messages) {
 app.post('/chat', async (req, res) => {
     const userMessage = req.body.content;
 
+    req.session.messages = req.session.messages || messages;
+
     req.session.messages.push({ role: 'user', content: userMessage });
 
     const assistantMessage = await getAssistantMessage(req.session.messages);
