@@ -46,6 +46,12 @@ if (initialConfig.rules && Array.isArray(initialConfig.rules)) {
     }
 }
 
+if (initialConfig.initMessages && Array.isArray(initialConfig.initMessages)) {
+    for (const message of initialConfig.initMessages) {
+        messages.push({ role: 'assistant', content: message });
+    }
+}
+
 app.use(session({
     secret: process.env.SECRET_KEY,
     resave: false,

@@ -1,6 +1,10 @@
 {
     "companyName": "Claro",
     "ownerName": "Renan Almeida",
+    "initMessages": [
+      "Olá!",
+      "Eu sou um chatbot da Claro, estou aqui para ajudá-lo com informações sobre os planos, serviços e produtos da Claro. Como posso ajudar você hoje?"
+    ],
     "functions": [
       "responder perguntas sobre planos",
       "fornecer informações de contato",
