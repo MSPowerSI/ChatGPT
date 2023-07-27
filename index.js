@@ -35,14 +35,14 @@ if (initialConfig.ownerName) {
 // Add functions as system messages
 if (initialConfig.functions && Array.isArray(initialConfig.functions)) {
     for (const func of initialConfig.functions) {
-        messages.push({ role: 'system', content: `Function: ${func}` });
+        messages.push({ role: 'system', content: `Função: ${func}` });
     }
 }
 
 // Add rules as system messages
 if (initialConfig.rules && Array.isArray(initialConfig.rules)) {
     for (const rule of initialConfig.rules) {
-        messages.push({ role: 'system', content: `Rule: ${rule}` });
+        messages.push({ role: 'system', content: `Regra: ${rule}` });
     }
 }
 
@@ -61,7 +61,7 @@ app.use(session({
 
 app.get('/', (req, res) => {
     // Load the chat messages from the session
-    req.session.messages = req.session.messages || messages;
+    req.session.messages = (req.session.messages != undefined || req.session.messages != null) ? req.session.messages : messages;
 
     res.render('front', { messages: req.session.messages.filter(message => message.role !== 'system') });
 });
@@ -78,7 +78,7 @@ async function getAssistantMessage(messages) {
 app.post('/chat', async (req, res) => {
     const userMessage = req.body.content;
 
-    req.session.messages = req.session.messages || messages;
+    req.session.messages = (req.session.messages != undefined || req.session.messages != null) ? req.session.messages : messages;
 
     req.session.messages.push({ role: 'user', content: userMessage });
 
