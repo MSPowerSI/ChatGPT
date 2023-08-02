@@ -3,6 +3,8 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import fs from 'fs';
 import session from 'express-session';
+import { createClient } from 'redis';
+import RedisStore from "connect-redis";
 
 dotenv.config();
 
@@ -18,6 +20,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
+app.set('trust proxy', 1);
 
 // Load initial information from config.json file
 const initialConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
@@ -52,12 +55,35 @@ if (initialConfig.initMessages && Array.isArray(initialConfig.initMessages)) {
     }
 }
 
-app.use(session({
+let redisClient = createClient({
+  url: process.env.REDIS_URL,
+});
+
+redisClient.connect().catch(console.error);
+
+let redisStore = new RedisStore({
+  client: redisClient,
+});
+
+redisClient.on("error", function (err) {
+  console.log("Could not establish a connection with redis. " + err);
+});
+redisClient.on("connect", function (err) {
+  console.log("Connected to redis successfully");
+});
+
+app.use(
+  session({
+    cookie: {
+      secure: true,
+      maxAge: 1000 * 60 * 10 // session max age in miliseconds
+    },
+    store: redisStore,
     secret: process.env.SECRET_KEY,
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
-}));
+    saveUninitialized: false
+  })
+);
 
 app.get('/', (req, res) => {
     // Load the chat messages from the session
