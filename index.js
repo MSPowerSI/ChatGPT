@@ -109,10 +109,15 @@ app.post('/chat', async (req, res) => {
 
   res.setHeader('Content-Type', 'text/plain');
 
+  let assistantMessage = '';
+
   for await (const part of stream) {
     const content = part.choices[0]?.delta?.content || '';
-    res.write(content); 
+    res.write(content);
+    assistantMessage += content;
   }
+
+  req.session.messages.push({ role: "assistant", content: assistantMessage });
 
   res.end();
 });
