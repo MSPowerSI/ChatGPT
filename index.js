@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from "openai";
+import OpenAI from 'openai';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import fs from 'fs';
@@ -8,11 +8,9 @@ import RedisStore from "connect-redis";
 
 dotenv.config();
 
-const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
-
-const openai = new OpenAIApi(configuration);
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,10 +27,6 @@ let messages = [];
 
 if (initialConfig.companyName) {
     messages.push({ role: 'system', content: `Company Name: ${initialConfig.companyName}` });
-}
-
-if (initialConfig.ownerName) {
-    messages.push({ role: 'system', content: `Owner Name: ${initialConfig.ownerName}` });
 }
 
 // Add functions as system messages
@@ -92,27 +86,35 @@ app.get('/', (req, res) => {
     res.render('front', { messages: req.session.messages.filter(message => message.role !== 'system') });
 });
 
-async function getAssistantMessage(messages) {
-    const completion = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: messages,
-    });
-
-    return completion.data.choices[0].message.content;
-}
 
 app.post('/chat', async (req, res) => {
-    const userMessage = req.body.content;
+  const userMessage = req.body.content;
 
-    req.session.messages = (req.session.messages != undefined || req.session.messages != null) ? req.session.messages : messages;
+  if (!req.session.messages) {
+    req.session.messages = [];
+  }
 
-    req.session.messages.push({ role: 'user', content: userMessage });
+  req.session.messages.push({ role: "user", content: userMessage });
 
-    const assistantMessage = await getAssistantMessage(req.session.messages);
+  const filteredMessages = req.session.messages.filter((message) => message.role !== "assistant");
 
-    req.session.messages.push({ role: 'assistant', content: assistantMessage });
+  const stream = await openai.chat.completions.create(
+    {
+      model: "gpt-3.5-turbo",
+      stream: true,
+      messages: filteredMessages,
+    },
+    { responseType: "stream" }
+  );
 
-    res.json({ content: assistantMessage });
+  res.setHeader('Content-Type', 'text/plain');
+
+  for await (const part of stream) {
+    const content = part.choices[0]?.delta?.content || '';
+    res.write(content); 
+  }
+
+  res.end();
 });
 
 app.listen(port, () => {

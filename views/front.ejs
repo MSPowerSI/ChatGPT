@@ -154,11 +154,26 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: message }),
-            }).then(res => res.json());
+            });
+
+            const reader = response.body.getReader();
+            let assistantMessage = '';
+            
+            const assistantDiv = document.createElement('div');
+            assistantDiv.className = 'assistant-message';
+            messagesDiv.appendChild(assistantDiv);
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const messageChunk = new TextDecoder("utf-8").decode(value);
+                assistantMessage += messageChunk;
+
+                assistantDiv.textContent = assistantMessage;
+            }
 
             messagesDiv.removeChild(typingIndicator);
-
-            messagesDiv.innerHTML += `<div class="assistant-message">${response.content}</div>`;
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
     </script>
