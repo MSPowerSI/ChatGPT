@@ -81,7 +81,7 @@ app.use(
 
 app.get('/', (req, res) => {
     // Load the chat messages from the session
-    req.session.messages = (req.session.messages != undefined || req.session.messages != null) ? req.session.messages : messages;
+    req.session.messages = (req.session.messages != undefined || req.session.messages != null) ? req.session.messages : [...messages];
 
     res.render('front', { messages: req.session.messages.filter(message => message.role !== 'system') });
 });
