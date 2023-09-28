@@ -142,12 +142,6 @@
             const messagesDiv = document.querySelector('#messages');
             messagesDiv.innerHTML += `<div class="user-message">${message}</div>`;
 
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'typing-indicator';
-            typingIndicator.textContent = 'digitando...';
-            messagesDiv.appendChild(typingIndicator);
-            typingIndicator.style.display = 'block';
-
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
             const response = await fetch('/chat', {
@@ -162,6 +156,12 @@
             const assistantDiv = document.createElement('div');
             assistantDiv.className = 'assistant-message';
             messagesDiv.appendChild(assistantDiv);
+
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.textContent = 'digitando...';
+            messagesDiv.appendChild(typingIndicator);
+            typingIndicator.style.display = 'block';
 
             while (true) {
                 const { done, value } = await reader.read();
