@@ -92,6 +92,7 @@ app.post('/chat', async (req, res) => {
 
   if (!req.session.messages) {
     req.session.messages = [];
+    req.session.messages = [...messages];
   }
 
   req.session.messages.push({ role: "user", content: userMessage });
